@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,60 +13,44 @@ def limit_description(description):
     return description
 
 
+# Create empty lists to store the scraped data
+phone_list = []
+company_name_list = []
+description_list = []
+website_list = []
 
-
-# Function to scrape data from a company page
+# Function to scrape data from a company page and append it to the lists
 def scrape_company_page(driver):
     try:
-        # Extract website
         website_element = driver.find_element(By.XPATH, '//*[@id="main"]/main/div/div/div/div[2]/div[2]/div[3]/div[2]/div/div/a')
         website = website_element.get_attribute("href")
-        #website = website_element.text.strip()
     except NoSuchElementException:
         website = "N/A"
-        
-        
-    #try:
-        #extract linkedin
-        #linkedin_element = driver.find_element(By.XPATH, '//a[contains(@href, "linkedin")]')
-        #linkedin = linkedin_element[1]
-        #linkedin = linkedin_element.get_attribute("href")
-    #except NoSuchElementException:
-        #linkedin = "N/A"
 
     try:
-        # Extract company name
         company_name_element = driver.find_element(By.XPATH, '//*[@id="main"]/main/div/div/div/div[2]/div[1]/div[2]/h1')
         company_name_text = company_name_element.text.strip()
     except NoSuchElementException:
         company_name_text = "N/A"
-    
+
     try:
-        # Extract phone number
         phone_element = driver.find_element(By.XPATH, '//*[@id="main"]/main/div/div/div/div[2]/div[2]/div[2]/div/div')
         phone = phone_element.text.strip()
-        
-        #phone_element_match = re.search(r'\b(?:\+?1[-.]?)?(?:\(\d{3}\)|\d{3})[-.]?\d{3}[-.]?\d{4}\b', phone)
-        #phone_number = phone_element_match.group(0) if phone_element_match else ""
-
     except NoSuchElementException:
         phone = "N/A"
-    
+
     try:
-        # Extract description
         description_element = driver.find_element(By.XPATH, '//*[@id="main"]/main/div/div/div/div[2]/div[2]/div[1]')
         description = description_element.text.strip()
         description = limit_description(description)
     except NoSuchElementException:
         description = "N/A"
 
-    # Print extracted information
-    print("Phone:", phone)
-    print("Company Name:", company_name_text)
-    print("Description:", description)
-    print("Website:", website)
-    #print("Linkedin:", linkedin)
-    print()
+    # Append the scraped data to the respective lists
+    phone_list.append(phone)
+    company_name_list.append(company_name_text)
+    description_list.append(description)
+    website_list.append(website)
 
 
 # URL of the RSS feed
@@ -89,7 +74,7 @@ for index, company_link in enumerate(company_links):
     driver.switch_to.window(driver.window_handles[1])
     driver.get(company_url)
 
-    # Scrape data from the company page
+    # Scrape data from the company page and append it to the lists
     scrape_company_page(driver)
 
     # Close the company tab
@@ -98,3 +83,18 @@ for index, company_link in enumerate(company_links):
 
 # Close the browser
 driver.quit()
+
+# Create a dataframe from the scraped data
+data = {
+    "Phone": phone_list,
+    "Company Name": company_name_list,
+    "Description": description_list,
+    "Website": website_list
+}
+df = pd.DataFrame(data)
+
+print(df)
+
+# Convert the dataframe to a CSV file
+df.to_csv("scraped_data.csv", index=False)
+
