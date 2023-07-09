@@ -7,10 +7,6 @@ from db_connect_helpers import insert_company_entry, insert_telephone_entry, ins
 DATABASE = 'isbu_db'
 USERNAME = 'sa'
 PASSWORD = 'reallyStrongPwd123'
-
-df = readin_csv('infosecindex.csv')
-df = df
-# company_df, telephone_df, email_df = separate_dfs(df)
  
 conn = pymssql.connect(server = '10.3.128.85', 
                       user = USERNAME,
