@@ -8,9 +8,28 @@ DATABASE = 'isbu_db'
 USERNAME = 'sa'
 PASSWORD = 'reallyStrongPwd123'
  
+# Create a connection
 conn = pymssql.connect(server = '10.3.128.85', 
                       user = USERNAME,
                       password = PASSWORD,
                       database = DATABASE)
 
 print(" CONNECTED TO DB SUCCESFULLY")
+
+# Create a cursor object
+cursor = conn.cursor()
+
+# Execute the query
+trial_query = "SELECT * FROM Company;"
+cursor.execute(trial_query)
+
+# Fetch all rows from the result
+rows = cursor.fetchall()
+
+# Print the results
+for row in rows:
+    print(row)
+
+# Close the cursor and the connection
+cursor.close()
+conn.close()
