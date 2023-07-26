@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-
+import pandas as pd
 
 def limit_description(description):
     if len(description) > 250:
@@ -12,6 +12,10 @@ def limit_description(description):
     return description
 
 
+phone_list = []
+company_name_list = []
+description_list = []
+website_list = []
 
 
 # Function to scrape data from a company page
@@ -50,11 +54,15 @@ def scrape_company_page(driver):
         description = "N/A"
 
     # Print extracted information
-    print("Phone:", phone)
-    print("Company Name:", company_name_text)
-    print("Description:", description)
-    print("Website:", website)
-    print()
+    # print("Phone:", phone)
+    # print("Company Name:", company_name_text)
+    # print("Description:", description)
+    # print("Website:", website)
+    # print()
+    phone_list.append(phone)
+    company_name_list.append(company_name_text)
+    description_list.append(description)
+    website_list.append(website)
 
 
 # URL of the RSS feed
@@ -87,3 +95,16 @@ for index, company_link in enumerate(company_links):
 
 # Close the browser
 driver.quit()
+
+data = {
+    "Phone": phone_list,
+    "Company Name": company_name_list,
+    "Description": description_list,
+    "Website": website_list
+}
+df = pd.DataFrame(data)
+
+print(df)
+
+# Convert the dataframe to a CSV file
+df.to_csv("Securex_data.csv", index=False)

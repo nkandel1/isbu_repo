@@ -5,6 +5,19 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
+import pandas as pd
+
+def limit_description(description):
+    if len(description) > 250:
+        description = description[:250] + "..."  # Truncate and add ellipsis
+    return description
+
+
+email_list = []
+company_name_list = []
+description_list = []
+
+
 
 # Function to scrape data from a company page
 def scrape_company_page(driver):
@@ -12,21 +25,25 @@ def scrape_company_page(driver):
         wait.until(EC.presence_of_element_located((By.XPATH, '//h2[contains(text(),"Contact Details")]')))
         name_element = driver.find_element(By.XPATH, '//h2[contains(text(),"Contact Details")]//following-sibling::strong')
         name = name_element.text.strip()
-        print("Name:", name)
+        #print("Name:", name)
     except NoSuchElementException:
-        print("Name: N/A")
+        name = "N/A"
+        #print("Name: N/A")
     except TimeoutException:
-        print("Contact Details section not found")
+        name = "Contact Details section not found"
+        #print("Contact Details section not found")
         
     try:
         wait.until(EC.presence_of_element_located((By.XPATH, '//h2[contains(text(),"Contact Details")]')))
         email_element = driver.find_element(By.XPATH, '/html/body/div[3]/div/div[4]/div[1]/div[3]/div[2]/a[2]')
         email = email_element.text.strip()
-        print("Email:", email)
+        #print("Email:", email)
     except NoSuchElementException:
-        print("Email: N/A")
+        email = "N/A"
+        #print("Email: N/A")
     except TimeoutException:
-        print("Contact Details section not found")    
+        email = "Contact Details section not found"
+        #print("Contact Details section not found")    
     
     
     
@@ -35,13 +52,20 @@ def scrape_company_page(driver):
         wait.until(EC.presence_of_element_located((By.XPATH, '//h2[contains(text(),"Products and Services")]')))
         company_description_element = driver.find_element(By.XPATH,'//h2[contains(text(),"Products and Services")]//following-sibling::ul')
         company_des_text = company_description_element.text.strip()
-        print("Description:", company_des_text)
+        #print("Description:", company_des_text)
     except NoSuchElementException:
-        print("Description: N/A")
+        company_des_text = "N/A"
+        #print("Description: N/A")
     except TimeoutException:
-        print("Products and Services section not found")
+        company_des_text = "N/A"
+        #print("Products and Services section not found")
 
-    print()
+    #print()       
+
+    email_list.append(email)
+    company_name_list.append(name)
+    description_list.append(company_des_text)
+
 
 # URL of the website
 ds_url = "https://www.defence-and-security.com/contractors/indexAtoZ.html"
@@ -76,3 +100,15 @@ for index, company_link in enumerate(company_links):
 
 # Close the browser
 driver.quit()
+
+data = {
+    "Email": email_list,
+    "Company Name": company_name_list,
+    "Description": description_list,
+}
+df = pd.DataFrame(data)
+
+print(df)
+
+# Convert the dataframe to a CSV file
+df.to_csv("d&s_a-z.csv", index=False)

@@ -1,4 +1,4 @@
-import pymssql 
+import pyodbc
 import pandas as pd
 from db_connect_helpers import readin_csv
 from db_connect_helpers import retrieve_telephones, retrieve_emails
@@ -8,13 +8,24 @@ DATABASE = 'isbu_db'
 USERNAME = 'sa'
 PASSWORD = 'reallyStrongPwd123'
  
-# Create a connection
-conn = pymssql.connect(server = '10.3.128.85', 
-                      user = USERNAME,
-                      password = PASSWORD,
-                      database = DATABASE)
 
-print(" CONNECTED TO DB SUCCESFULLY")
+# Establish a connection using the ODBC driver and connection string
+conn = pyodbc.connect(
+    driver='{ODBC Driver 18 for SQL Server}',  # Replace with the appropriate ODBC driver name
+    server='194.90.46.138',  # Replace with the server name or IP address of your MSSQL Edge server
+    database=DATABASE,  # Replace with the name of your database
+    uid=USERNAME,  # Replace with your username
+    pwd=PASSWORD  # Replace with your password
+)
+
+
+# # Create a connection
+# conn = pymssql.connect(server = '194.90.46.138', 
+#                       user = USERNAME,
+#                       password = PASSWORD,
+#                       database = DATABASE)
+
+# print(" CONNECTED TO DB SUCCESFULLY")
 
 # Create a cursor object
 cursor = conn.cursor()
